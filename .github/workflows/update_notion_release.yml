@@ -22,6 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install requests notion-client
+          pip install -r requirements.txt
       - name: Debug directory
         run: |
           pwd
