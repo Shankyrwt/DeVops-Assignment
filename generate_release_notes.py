@@ -3,26 +3,15 @@ import json
 from jira import JIRA
 import sys
 
-def get_completed_tickets(jira, sprint_name):
-    jql_query = f'project = YourProjectKey AND labels = {sprint_name} AND (status = Done OR status = Closed)'
-    issues = jira.search_issues(jql_query)
-    
-    completed_tickets = []
-    for issue in issues:
-        ticket_info = {
-            'key': issue.key,
-            'summary': issue.fields.summary,
-            'type': issue.fields.issuetype.name,
-            'assignee': issue.fields.assignee.displayName if issue.fields.assignee else 'Unassigned'
-        }
-        completed_tickets.append(ticket_info)
-    
-    return completed_tickets
-
 def generate_release_notes(sprint_name):
     try:
+        print("Starting generate_release_notes function")
+        
         jira_token = os.environ.get('JIRA_API_TOKEN')
         jira_domain = os.environ.get('JIRA_DOMAIN')
+
+        print(f"JIRA_API_TOKEN exists: {bool(jira_token)}")
+        print(f"JIRA_DOMAIN exists: {bool(jira_domain)}")
 
         if not jira_token or not jira_domain:
             raise ValueError("JIRA_API_TOKEN or JIRA_DOMAIN environment variables are not set")
@@ -31,19 +20,13 @@ def generate_release_notes(sprint_name):
         jira = JIRA(server=f"https://{jira_domain}", token_auth=jira_token)
         
         print(f"Fetching tickets for sprint: {sprint_name}")
-        tickets = get_completed_tickets(jira, sprint_name)
-        
-        release_notes = {
-            "sprint_name": sprint_name,
-            "tickets": tickets
-        }
-        
-        with open('release_notes.json', 'w') as f:
-            json.dump(release_notes, f, indent=2)
-        
-        print(f"Release notes generated and saved to release_notes.json")
+        # Rest of your function...
+
     except Exception as e:
         print(f"Error generating release notes: {str(e)}")
+        print("Environment variables:")
+        for key, value in os.environ.items():
+            print(f"{key}: {'*' * len(value)}")  # Print asterisks instead of actual value for security
         sys.exit(1)  # Exit with an error code
 
 if __name__ == "__main__":
