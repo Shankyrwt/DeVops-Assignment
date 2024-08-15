@@ -21,18 +21,33 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests notion-client
-          pip install -r requirements.txt
+          pip install requests notion-client jira
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
       - name: Debug directory
         run: |
           pwd
           ls -la
+
       - name: Generate release notes
         env:
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_DOMAIN: ${{ secrets.JIRA_DOMAIN }}
           NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
         run: |
           python generate_release_notes.py ${{ github.event.inputs.sprint_name }}
+
+      - name: Convert JSON to Markdown
+        run: |
+          echo "# Release Notes for ${{ github.event.inputs.sprint_name }}" > release_notes.md
+          echo "" >> release_notes.md
+          echo "## What's Changed" >> release_notes.md
+          if [ -f release_notes.json ]; then
+            jq -r '.tickets[] | "- \(.type) - \(.key): \(.summary) (Assignee: \(.assignee))"' release_notes.json >> release_notes.md
+          else
+            echo "No tickets found for this sprint." >> release_notes.md
+          fi
+
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
