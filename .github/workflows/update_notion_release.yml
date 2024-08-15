@@ -29,7 +29,7 @@ jobs:
           JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
           NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
         run: |
-          python generate_release_notes.py ${{ github.event.inputs.sprint_name }}
+          python ./generate_release_notes.py ${{ github.event.inputs.sprint_name }}
       - name: Convert JSON to Markdown
         run: |
           echo "# Release Notes for ${{ github.event.inputs.sprint_name }}" > release_notes.md
